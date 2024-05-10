@@ -5,6 +5,10 @@ import { Field } from './Field';
 import { GameEventEmitter } from './EventEmmiter';
 import { PlayfieldPositionDescription } from './PlayfieldPositionDescription';
 
+export class Move {
+  index : number
+  score : number
+}
 export class Playfield extends Container {
   private readonly playfield: Sprite;
   private fields: Array<Array<Field>>;
@@ -19,6 +23,10 @@ export class Playfield extends Container {
   private readonly game;
   private readonly restartButtonContainer: Container;
   private bitmapFontLight: PIXI.BitmapText;
+
+  private board:Array<number | string> = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+  private huPlayer = "P";
+  private aiPlayer = "C";
 
   constructor(game, resources) {
     super();
@@ -85,6 +93,7 @@ export class Playfield extends Container {
     this.fields = [[], [], []];
     this.bitmapFontLight.text = 'TIC TAC TOE';
     this.fieldsCreator();
+    this.board = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   }
 
   private fieldsCreator() {
@@ -106,7 +115,9 @@ export class Playfield extends Container {
     animCross.anchor.set(0.5, 0.5);
     this.addChild(animCross);
     animCross.animationSpeed = 0.8;
-
+    ////
+    this.board[id] = this.huPlayer;
+    ////
     let counterIterable = 0;
     for (let i = 0; i < this.matrix.length; i++) {
       for (let j = 0; j < this.matrix[i].length; j++) {
@@ -212,6 +223,78 @@ export class Playfield extends Container {
     return false;
   }
 
+  private minimax(player) {
+    //iter++;
+    let array = this.avail();
+    if (this.winning(this.board, this.huPlayer)) {
+      return {
+        score: -10
+      };
+    } else if (this.winning(this.board, this.aiPlayer)) {
+      return {
+        score: 10
+      };
+    } else if (array.length === 0) {
+      return {
+        score: 0
+      };
+    }
+
+    let moves = [];
+    for (let i = 0; i < array.length; i++) {
+      let move:Move = new Move();
+      move.index = this.board[array[i]];
+      this.board[array[i]] = player;
+
+      if (player == this.aiPlayer) {
+        let g = this.minimax(this.huPlayer);
+        move.score = g.score;
+      } else {
+        let g = this.minimax(this.aiPlayer);
+        move.score = g.score;
+      }
+      this.board[array[i]] = move.index;
+      moves.push(move);
+    }
+
+    let bestMove;
+    if (player === this.aiPlayer) {
+      let bestScore = -10000;
+      for (let i = 0; i < moves.length; i++) {
+        if (moves[i].score > bestScore) {
+          bestScore = moves[i].score;
+          bestMove = i;
+        }
+      }
+    } else {
+      let bestScore = 10000;
+      for (let i = 0; i < moves.length; i++) {
+        if (moves[i].score < bestScore) {
+          bestScore = moves[i].score;
+          bestMove = i;
+        }
+      }
+    }
+    return moves[bestMove];
+  }
+
+  //available spots
+  private avail() {
+    return this.board.filter(s => s != "P" && s != "C");
+  }
+
+// winning combinations
+  private winning(board, player) {
+    return (board[0] == player && board[1] == player && board[2] == player) ||
+        (board[3] == player && board[4] == player && board[5] == player) ||
+        (board[6] == player && board[7] == player && board[8] == player) ||
+        (board[0] == player && board[3] == player && board[6] == player) ||
+        (board[1] == player && board[4] == player && board[7] == player) ||
+        (board[2] == player && board[5] == player && board[8] == player) ||
+        (board[0] == player && board[4] == player && board[8] == player) ||
+        (board[2] == player && board[4] == player && board[6] == player);
+  }
+
   private opponentMove() {
     let counterIterable = 0;
     let possiblePositionsForCircleDraw = [];
@@ -226,9 +309,8 @@ export class Playfield extends Container {
         }
       }
     }
-    const getPosition = Math.floor(Math.random() * possiblePositionsForCircleDraw.length);
-    const resultChoice = possiblePositionsForCircleDraw[getPosition];
-
+    const resultChoice = this.minimax(this.aiPlayer).index;
+    this.board[resultChoice] = this.aiPlayer;
     counterIterable = 0;
 
     for (let i = 0; i < this.matrix.length; i++) {
