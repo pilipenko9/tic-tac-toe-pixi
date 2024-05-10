@@ -1,0 +1,42 @@
+{
+  "name": "pixi-tic-tac-toe",
+  "version": "0.0.1",
+  "license": "",
+  "description": "",
+  "main": "./src/app.ts",
+  "scripts": {
+    "npm-reset": "rm -rf node_modules && npm cache verify && npm i",
+    "start": "webpack serve",
+    "build": "webpack"
+  },
+  "dependencies": {
+    "pixi.js": "^6.5.9",
+    "pixi-spine": "^4.0.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.21.8",
+    "@babel/preset-env": "^7.21.5",
+    "@types/node": "^20.2.3",
+    "@types/pixi.js": "5.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.7",
+    "@typescript-eslint/parser": "^5.59.7",
+    "babel-loader": "^9.1.2",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.7.4",
+    "eslint": "^8.41.0",
+    "eslint-plugin-import": "^2.27.5",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.1",
+    "http-proxy-middleware": "^2.0.6",
+    "prettier": "2.8.8",
+    "sass": "^1.62.1",
+    "sass-loader": "^13.3.0",
+    "style-loader": "^3.3.3",
+    "ts-loader": "^9.4.3",
+    "typescript": "^5.0.4",
+    "webpack": "^5.83.1",
+    "webpack-cli": "^5.1.1",
+    "webpack-dev-server": "^4.15.0"
+  }
+}
